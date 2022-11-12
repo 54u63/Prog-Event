@@ -43,7 +43,6 @@ class queen():
         self.pos_x=a
         self.pos_y=b
         pos_queen.append([self.pos_x,self.pos_y])
-
     def create_queen(self,size):
         pos_x=self.pos_x*size+size/2
         pos_y=self.pos_y*size+size/2
@@ -82,9 +81,14 @@ def move(e):
         pass
     else:
         global queens
-        queens[mouse_case].queen.destroy()
-        queens[mouse_case].queen=main_canva.create_image(e.x,e.y,image=queens[mouse_case].img)
-
+        global size
+        cu_queen=queens[mouse_case]
+        queen_pos=[cu_queen.pos_x*size+size/2,cu_queen.pos_y*size+size/2]
+        move_h=queen_pos[0]-e.x
+        move_v=queen_pos[1]-e.y
+        print(str(move_h)+" "+str(move_v)+"\n\n")
+        main_canva.move(cu_queen,move_h,move_v)
+        
 def release(e):
     print("")
 label=Label(root,text="")
