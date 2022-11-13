@@ -131,7 +131,7 @@ queens=queens_list[1]
 
 ###############################fonctions########################################################
 
-def color_aviable(queen,pos_queens,size):
+def color_aviable(queen,pos_queens,size,color_tab=[]):
     aviablepos=queen.case
     out=1
     if queen.show_case==False:
@@ -140,27 +140,29 @@ def color_aviable(queen,pos_queens,size):
             posx_square=aviablepos[i][0]*size
             posy_square=aviablepos[i][1]*size
             if aviablepos[i] in pos_queens:
-                posx_square=aviablepos[i][0]*size
-                posy_square=aviablepos[i][1]*size
                 main_canva.create_rectangle(posx_square,posy_square,posx_square+size,posy_square+size,fill="red")
+                color_tab.append("queen")
             else:
+                pos=(main_canva.winfo_rootx()+posx_square+2,main_canva.winfo_rooty()+posy_square+2,main_canva.winfo_rootx()+posx_square+3,main_canva.winfo_rooty()+posy_square+3)
+                color=ImageGrab.grab(pos).getpixel((0,0))
+                if color==(255,255,255):
+                    color_tab.append("white")
+                if color==(0,0,0):
+                    color_tab.append("black")
                 main_canva.create_rectangle(posx_square,posy_square,posx_square+size,posy_square+size,fill="green")
-        return True
+        
+        return True,color_tab
 
     if queen.show_case==True:
         for i in range(len(aviablepos)):
-            print(main_canva.winfo_rootx)
-            print(ImageGrab.grab((main_canva.winfo_rootx,main_canva.winfo_rooty)))
             posx_square=aviablepos[i][0]*size
             posy_square=aviablepos[i][1]*size
             if aviablepos[i] in pos_queens:
                 main_canva.create_image(posx_square+size/2,posy_square+size/2,image=queen.img)
             else:
-                if aviablepos[i][0]%2==0 and aviablepos[i][1]%2==0:
-                    main_canva.create_rectangle(posx_square,posy_square,posx_square+size,posy_square+size,fill="white")
-                else:
-                    main_canva.create_rectangle(posx_square,posy_square,posx_square+size,posy_square+size,fill="black")
-        return False
+                print(color_tab[i])
+                main_canva.create_rectangle(posx_square,posy_square,posx_square+size,posy_square+size,fill=color_tab[i])
+        return False,color_tab
 
 
 
@@ -176,19 +178,31 @@ def mouse_pos_checker(e):
         else:
             pass
     return out
+
+global color_tab
+color_tab=[]
 def move(e):
     mouse_case=mouse_pos_checker(e)
     if mouse_case==8:
-        color_refresh
+        pass
     else:
         global queens
         global queen_pos
         global size
-        queens[mouse_case].show_case=color_aviable(queens[mouse_case],queen_pos,size)
-        
+        global color_tab
+        if queens[mouse_case].show_case==False:
+            out=color_aviable(queens[mouse_case],queen_pos,size)
+            queens[mouse_case].show_case=out[0]
+            color_tab=out[1]
+        else:
+            out=color_aviable(queens[mouse_case],queen_pos,size,color_tab=color_tab)
+            queens[mouse_case].show_case=out[0]
+            print(out[1])
+
 
 def release(e):
-    print("")
+    pass
+
 label=Label(root,text="")
 label.pack()
 
