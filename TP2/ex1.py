@@ -59,7 +59,7 @@ class switch:
 
 class client:
     def __init__(self):
-         """
+        """
         importe dans le constructeur l'image
         et créé positions
         """       
@@ -78,6 +78,14 @@ class client:
 
 #########################################FONCTIONS####################################
 
+def create_routeur():
+    print("routeur")
+
+def create_switch():
+    print("switch")
+
+def create_client():
+    print("client")
 
 
 
@@ -89,6 +97,17 @@ object_list=[]
 
 
 #########################################CALLBACKS###############################
+def click(e):
+    if selector.state=="Routeur":
+        create_routeur()
+    elif selector.state=="Switch":
+        create_switch()
+    elif selector.state=="Client":
+        create_client()
+    else:
+        pass
+
+
 
 def pressed(e):
     if e.char=="r":
@@ -104,5 +123,5 @@ def pressed(e):
 
 
 root.bind("<KeyPress>",pressed)
-
+root.bind("<Button-1>",click)
 root.mainloop()
