@@ -4,7 +4,7 @@ root=Tk()
 
 
 main_canva=Canvas(root,bg="white",width=1000,height=1000)
-
+main_canva.pack()
 class pointeur:
     def __init__(self):
         self.state="None"
@@ -23,5 +23,17 @@ class routeur:
 
 selector=pointeur()
 
+def pressed(e):
+    if e.char=="r":
+        selector.state="Routeur"
+    elif e.char=="s":
+        selector.state="Switch"
+    elif e.char=="c":
+        selector.state="Client"
+    else:
+        pass
+    print(e.char)
+
+root.bind("<KeyPress>",pressed)
 
 root.mainloop()
