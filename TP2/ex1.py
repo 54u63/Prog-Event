@@ -29,10 +29,10 @@ class routeur:
         initialise l'objet en l'important dans le canva
         à l'endroit ou l'utilisateur à cliqué.
         """
-        print(self.img)
         self.posx=e.x
         self.posy=e.y
         self.id=identifier
+        self.name="R"+str(self.id)
         self.routeur=main_canva.create_image(self.posx,self.posy,image=self.img)
 
 ########################################CREATION DE LA CLASSE SWITCH###########################
@@ -53,6 +53,7 @@ class switch:
         self.posx=e.x
         self.posy=e.y
         self.id=identifier
+        self.name="Sw"+str(self.id)
         self.switch=main_canva.create_image(self.posx,self.posy,image=self.img)
 
 
@@ -75,24 +76,25 @@ class client:
         self.posx=e.x
         self.posy=e.y
         self.id=identifier
+        self.name="C"+str(self.id)
         self.client=main_canva.create_image(self.posx,self.posy,image=self.img)
 
 #########################################FONCTIONS####################################
 
 def create_routeur(e,object_list):
     new_routeur=routeur()
-    new_routeur.initialize(e,len(object_list))
-    object_list.append(new_routeur)
+    new_routeur.initialize(e,len(object_list[0]))
+    object_list[0].append(new_routeur)
 
 def create_switch(e,object_list):
     new_switch=switch()
-    new_switch.initialize(e,len(object_list))
-    object_list.append(new_switch)
+    new_switch.initialize(e,len(object_list[1]))
+    object_list[1].append(new_switch)
 
 def create_client(e,object_list):
     new_client=client()
-    new_client.initialize(e,len(object_list))
-    object_list.append(new_client)
+    new_client.initialize(e,len(object_list[2]))
+    object_list[2].append(new_client)
 
 
 
@@ -100,7 +102,7 @@ def create_client(e,object_list):
 ########################################VARIABLES####################################
 selector=pointeur()
 global object_list
-object_list=[]
+object_list=[[],[],[]]
 
 
 
