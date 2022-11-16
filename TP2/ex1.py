@@ -16,12 +16,12 @@ class pointeur:
 
 ########################################CREATION DE L'OBJET ROUTEUR#########################
 class routeur:
-    def __init___(self):
+    def __init__(self):
         """
         importe dans le constructeur l'image
         et créé positions
         """
-        self.img=ImageTk.PhotoImage(Image.open("routeur.jpg"))
+        self.img=ImageTk.PhotoImage(Image.open("routeur.png"))
         self.posx=0
         self.posy=0 
     def initialize(self,e,identifier):
@@ -29,6 +29,7 @@ class routeur:
         initialise l'objet en l'important dans le canva
         à l'endroit ou l'utilisateur à cliqué.
         """
+        print(self.img)
         self.posx=e.x
         self.posy=e.y
         self.id=identifier
@@ -74,36 +75,44 @@ class client:
         self.posx=e.x
         self.posy=e.y
         self.id=identifier
-        self.client=main_canva.createimage(self.posx,self.posy,image=self.img)
+        self.client=main_canva.create_image(self.posx,self.posy,image=self.img)
 
 #########################################FONCTIONS####################################
 
-def create_routeur():
-    print("routeur")
+def create_routeur(e,object_list):
+    new_routeur=routeur()
+    new_routeur.initialize(e,len(object_list))
+    object_list.append(new_routeur)
 
-def create_switch():
-    print("switch")
+def create_switch(e,object_list):
+    new_switch=switch()
+    new_switch.initialize(e,len(object_list))
+    object_list.append(new_switch)
 
-def create_client():
-    print("client")
+def create_client(e,object_list):
+    new_client=client()
+    new_client.initialize(e,len(object_list))
+    object_list.append(new_client)
 
 
 
 
 ########################################VARIABLES####################################
 selector=pointeur()
+global object_list
 object_list=[]
 
 
 
 #########################################CALLBACKS###############################
 def click(e):
+    global object_list
     if selector.state=="Routeur":
-        create_routeur()
+        create_routeur(e,object_list)
     elif selector.state=="Switch":
-        create_switch()
+        create_switch(e,object_list)
     elif selector.state=="Client":
-        create_client()
+        create_client(e,object_list)
     else:
         pass
 
