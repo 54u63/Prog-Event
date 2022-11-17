@@ -22,8 +22,7 @@ class routeur:
         et créé positions
         """
         self.img=ImageTk.PhotoImage(Image.open("routeur.png"))
-        self.posx=0
-        self.posy=0 
+        self.size=32.5 
     def initialize(self,e,identifier):
         """
         initialise l'objet en l'important dans le canva
@@ -33,7 +32,14 @@ class routeur:
         self.posy=e.y
         self.id=identifier
         self.name="R"+str(self.id)
+        self.rangeX=[self.posx-self.size,self.posx+self.size]
+        self.rangeY=[self.posx-self.size,self.posy+self.size]
         self.routeur=main_canva.create_image(self.posx,self.posy,image=self.img)
+        self.placeholder=main_canva.create_text(self.posx,self.posy+self.size,text=self.name)
+    def change_name(self,name):
+        self.name=name
+        main_canva.itemconfigure(self.placeholder,text=self.name)
+
 
 ########################################CREATION DE LA CLASSE SWITCH###########################
 class switch:
@@ -117,7 +123,6 @@ def click(e):
         create_client(e,object_list)
     else:
         pass
-
 
 
 def pressed(e):
