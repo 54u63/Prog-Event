@@ -13,7 +13,7 @@ class pointeur:
     def __init__(self):
         self.state="None"
         self.menu_enable=False
-
+        self.obj=[0,0]
 
 ########################################CREATION DE L'OBJET ROUTEUR#########################
 class routeur:
@@ -111,7 +111,8 @@ class menu_square:
     def is_clicked(self,e):
         if e.x<self.t1x+(self.size_x-27) and e.x>self.t1x-27:
             if e.y<self.t1y+7 and e.y>self.t1y-7:
-                print("rename")
+                global object_list
+                rename(object_list[selector.obj[0]][selector.obj[1]])
                 return 0
         if e.x<self.t2x+(self.size_x-18) and e.x>self.t2x-18:
             print("hi")
@@ -120,6 +121,20 @@ class menu_square:
                 return 0
 
 #########################################FONCTIONS####################################
+
+def rename(name):
+    main_canva.create_rectangle(200,200,800,800,outline="black",fill="white")
+    textbox=Entry(root,text=name)
+    label=Label(root,text="nom?")
+    bouton=Button(root,text="valider",command=effective_rename(name))
+    main_canva.create_window(500,400,window=label)
+    main_canva.create_window(500,425,window=textbox)
+    main_canva.create_window(500,450,window=bouton)
+    print(name)
+
+def effective_rename(name):
+    global object_list 
+    object_list[selector.obj[0]][selector.obj[1]].name=name
 
 def create_routeur(e,object_list):
     new_routeur=routeur()
@@ -154,8 +169,8 @@ def destroy_menu():
 selector=pointeur()
 global object_list
 object_list=[[],[],[]]
-
-
+exit_button=Button(root,text="X",command=root.quit())
+main_canva.create_window(925,10,window=exit_button)
 
 #########################################CALLBACKS###############################
 def click(e):
@@ -192,13 +207,11 @@ def rmb(e):
     if selector.menu_enable is False:
         for i in range(len(object_list)):
             for j in range(len(object_list[i])):
-                print(str(e.x))
-                print(str(e.y))
-                print(str(object_list[i][j].rangeX)+" "+str(object_list[i][j].rangeY))
                 if e.x < object_list[i][j].rangeX[1] and e.x > object_list[i][j].rangeX[0]:
                     if e.y<object_list[i][j].rangeY[1] and e.y > object_list[i][j].rangeY[0]:
                         global menu_size
                         menu_size=menu(e)
+                        selector.obj=[i,j]
                         return 0
     if selector.menu_enable is True:
         destroy_menu()    
