@@ -16,13 +16,12 @@ class pointeur:
         self.obj=[0,0]
 
 ########################################CREATION DE L'OBJET ROUTEUR#########################
-class routeur:
+class equipement():
     def __init__(self):
         """
         importe dans le constructeur l'image
         et créé positions
         """
-        self.img=ImageTk.PhotoImage(Image.open("routeur.png"))
         self.size=32.5 
     def initialize(self,e,identifier):
         """
@@ -32,7 +31,7 @@ class routeur:
         self.posx=e.x
         self.posy=e.y
         self.id=identifier
-        self.name="R"+str(self.id)
+        self.name=self.prefix+str(self.id)
         self.rangeX=[self.posx-self.size,self.posx+self.size]
         self.rangeY=[self.posx-self.size,self.posy+self.size]
         self.routeur=main_canva.create_image(self.posx,self.posy,image=self.img)
@@ -42,53 +41,41 @@ class routeur:
         main_canva.itemconfigure(self.placeholder,text=self.name)
 
 
+class routeur(equipement):
+    def __init__(self):
+        super().__init__()
+        self.img=ImageTk.PhotoImage(Image.open("routeur.png"))
+        self.prefix="R"
+    def initialize(self,e,identifier):
+        super().initialize(e,identifier)
+    def change_name(self,name):
+        super().change_name(self,name)
+
+
 ########################################CREATION DE LA CLASSE SWITCH###########################
-class switch:
+class switch(equipement):
     def __init__(self):
-        """
-        importe dans le constructeur l'image
-        et créé positions
-        """
+        super().__init__()
         self.img=ImageTk.PhotoImage(Image.open("switch.png"))
-        self.size=32.5
+        self.prefix="S"
     def initialize(self,e,identifier):
-        """
-        initialise l'objet en l'important dans le canva
-        à l'endroit ou l'utilisateur à cliqué.
-        """
-        self.posx=e.x
-        self.posy=e.y
-        self.rangeX=[self.posx-self.size,self.posx+self.size]
-        self.rangeY=[self.posx-self.size,self.posy+self.size]       
-        self.id=identifier
-        self.name="Sw"+str(self.id)
-        self.switch=main_canva.create_image(self.posx,self.posy,image=self.img)
-        self.placeholder=main_canva.create_text(self.posx,self.posy+self.size,text=self.name)
+        super().initialize(e,identifier)
+    def change_name(self,name):
+        super().change_name(name)
 
 
-##########################################CREATION DE LA CLASSE CLIENT#########################
+#########################################CREATION DE LA CLASSE CLIENT#########################
 
-class client:
+class client(equipement):
     def __init__(self):
-        """
-        importe dans le constructeur l'image
-        et créé positions
-        """       
+        super().__init__()
         self.img=ImageTk.PhotoImage(Image.open("PC.png"))
-        self.size=32.5
+        self.prefix="C"
     def initialize(self,e,identifier):
-        """
-        initialise l'objet en l'important dans le canva
-        à l'endroit ou l'utilisateur à cliqué.
-        """
-        self.posx=e.x
-        self.posy=e.y
-        self.rangeX=[self.posx-self.size,self.posx+self.size]
-        self.rangeY=[self.posx-self.size,self.posy+self.size]        
-        self.id=identifier
-        self.name="C"+str(self.id)
-        self.client=main_canva.create_image(self.posx,self.posy,image=self.img)
-        self.placeholder=main_canva.create_text(self.posx,self.posy+self.size,text=self.name)
+        super().initialize(e,identifier)
+    def change_name(self,name):
+        super().change_name(name)
+
 
 class menu_square:
     def __init__(self):
@@ -140,16 +127,19 @@ def create_routeur(e,object_list):
     new_routeur=routeur()
     new_routeur.initialize(e,len(object_list[0]))
     object_list[0].append(new_routeur)
+    selector.state="None"
 
 def create_switch(e,object_list):
     new_switch=switch()
     new_switch.initialize(e,len(object_list[1]))
     object_list[1].append(new_switch)
+    selector.state="None"
 
 def create_client(e,object_list):
     new_client=client()
     new_client.initialize(e,len(object_list[2]))
     object_list[2].append(new_client)
+    selector.state="None"
 
 def menu(e):
     global menu_clicked
