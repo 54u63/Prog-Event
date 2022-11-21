@@ -1,9 +1,12 @@
 from tkinter import *
 from PIL import Image,ImageTk
 from time import *
+from tkinter import ttk
+
+
+
+
 root=Tk()
-
-
 main_canva=Canvas(root,bg="white",width=1000,height=1000)
 main_canva.pack()
 
@@ -17,12 +20,12 @@ class pointeur:
 
 ########################################CREATION DE L'OBJET ROUTEUR#########################
 class equipement():
-    def __init__(self):
+    def __init__(self): 
         """
         importe dans le constructeur l'image
         et créé positions
         """
-        self.size=32.5 
+        self.size=35
     def initialize(self,e,identifier):
         """
         initialise l'objet en l'important dans le canva
@@ -32,24 +35,23 @@ class equipement():
         self.posy=e.y
         self.id=identifier
         self.name=self.prefix+str(self.id)
-        self.rangeX=[self.posx-self.size,self.posx+self.size]
-        self.rangeY=[self.posx-self.size,self.posy+self.size]
-        self.routeur=main_canva.create_image(self.posx,self.posy,image=self.img)
+        self.rangeX=[e.x-self.size,e.x+self.size]
+        self.rangeY=[e.y-self.size,e.y+self.size]
+        self.object=main_canva.create_image(self.posx,self.posy,image=self.img)
         self.placeholder=main_canva.create_text(self.posx,self.posy+self.size,text=self.name)
     def change_name(self,name):
         self.name=name
         main_canva.itemconfigure(self.placeholder,text=self.name)
 
-
 class routeur(equipement):
-    def __init__(self):
+    def __init__(se lf):
         super().__init__()
         self.img=ImageTk.PhotoImage(Image.open("routeur.png"))
         self.prefix="R"
     def initialize(self,e,identifier):
         super().initialize(e,identifier)
     def change_name(self,name):
-        super().change_name(self,name)
+        super().change_name(name)
 
 
 ########################################CREATION DE LA CLASSE SWITCH###########################
@@ -99,10 +101,9 @@ class menu_square:
         if e.x<self.t1x+(self.size_x-27) and e.x>self.t1x-27:
             if e.y<self.t1y+7 and e.y>self.t1y-7:
                 global object_list
-                rename(object_list[selector.obj[0]][selector.obj[1]])
+                rename(object_list[selector.obj[0]][selector.obj[1]].name)
                 return 0
         if e.x<self.t2x+(self.size_x-18) and e.x>self.t2x-18:
-            print("hi")
             if e.y<self.t2y+7 and e.x>self.t2y-7:
                 print("icone")
                 return 0
@@ -110,36 +111,50 @@ class menu_square:
 #########################################FONCTIONS####################################
 
 def rename(name):
-    main_canva.create_rectangle(200,200,800,800,outline="black",fill="white")
-    textbox=Entry(root,text=name)
+    global object_list
+    obj=object_list[selector.obj[0]][selector.obj[1]]
+    def get_name():
+        global menu_clicked
+        obj.change_name(textbox.get())
+        main_canva.delete(cute_labe)
+        main_canva.delete(cute_txtbox)
+        main_canva.delete(cute_button)
+        main_canva.delete(cute_rectangle)
+        menu_clicked.destroy_menu()
+    cute_rectangle=main_canva.create_rectangle(200,200,800,800,outline="black",fill="white")
+    textbox=Entry(root)
     label=Label(root,text="nom?")
-    bouton=Button(root,text="valider",command=effective_rename(name))
-    main_canva.create_window(500,400,window=label)
-    main_canva.create_window(500,425,window=textbox)
-    main_canva.create_window(500,450,window=bouton)
-    print(name)
+    bouton=ttk.Button(root,text="valider",command=get_name)
+    cute_labe=main_canva.create_window(500,400,window=label)
+    cute_txtbox=main_canva.create_window(500,425,window=textbox)
+    cut e_button=main_canva.create_window(500,450,window=bouton)
 
-def effective_rename(name):
-    global object_list 
-    object_list[selector.obj[0]][selector.obj[1]].name=name
+def icone():
+    cute_rectangle=main_canva.create_rectangle(200,200,800,800,outline="black",fill="white")
+    switch=main_canva.create_image(self.posx,self.posy,image="switch.png")
+    routeur=main_canva.create_image(self.posx,self.posy,image="routeur.png")
+    client=main_canva.create_image(self.posx,self.posy,image="PC.png")
+
+
+
 
 def create_routeur(e,object_list):
+    selector.state="None"
     new_routeur=routeur()
     new_routeur.initialize(e,len(object_list[0]))
     object_list[0].append(new_routeur)
-    selector.state="None"
-
+    
 def create_switch(e,object_list):
-    new_switch=switch()
+    selector.state="None"
+    new_switch=switch() 
     new_switch.initialize(e,len(object_list[1]))
     object_list[1].append(new_switch)
-    selector.state="None"
 
 def create_client(e,object_list):
+    selector.state="None"
     new_client=client()
     new_client.initialize(e,len(object_list[2]))
     object_list[2].append(new_client)
-    selector.state="None"
 
 def menu(e):
     global menu_clicked
@@ -152,7 +167,7 @@ def menu(e):
 def destroy_menu():
     global menu_clicked
     menu_clicked.destroy_menu()
-    selector.menu_enable=False
+    selector.menu_enable=False 
 
 
 ########################################VARIABLES####################################
@@ -204,7 +219,7 @@ def rmb(e):
                         selector.obj=[i,j]
                         return 0
     if selector.menu_enable is True:
-        destroy_menu()    
+         destroy_menu()    
    
 root.bind("<KeyPress>",pressed)
 root.bind("<Button-1>",click)
