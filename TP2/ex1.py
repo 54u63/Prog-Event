@@ -18,7 +18,7 @@ class pointeur:
         self.menu_enable=False
         self.icone=False
         self.obj=[0,0]
-
+        self.rename=False
 ########################################CREATION DE L'OBJET ROUTEUR#########################
 class equipement():
     def __init__(self): 
@@ -49,6 +49,7 @@ class routeur(equipement):
         super().__init__()
         self.prefix="R"
         self.img=images[0]
+        self.port=1
     def initialize(self,e,identifier):
         super().initialize(e,identifier)
     def change_name(self,name):
@@ -59,6 +60,7 @@ class switch(equipement):
         super().__init__()
         self.prefix="S"
         self.img=images[1]
+        self.port=2
     def initialize(self,e,identifier):
         super().initialize(e,identifier)
     def change_name(self,name):
@@ -69,6 +71,7 @@ class client(equipement):
         super().__init__()
         self.prefix="C"
         self.img=images[2]
+        self.port=1
     def initialize(self,e,identifier):
         super().initialize(e,identifier)
     def change_name(self,name):
@@ -102,17 +105,20 @@ class menu_square:
             if e.y<self.t2y+7 and e.y>self.t2y-7:
                 icone()
                 return 0
+
+
+
 #########################################FONCTIONS####################################
 def rename(name):
     global object_list
+    selector.rename=True
     obj=object_list[selector.obj[0]][selector.obj[1]]
     def get_name():
+        selector.rename=False
         global menu_clicked
         obj.change_name(textbox.get())
-        main_canva.delete(cute_labe)
-        main_canva.delete(cute_txtbox)
-        main_canva.delete(cute_button)
-        main_canva.delete(cute_rectangle)
+        for i in range(len(rename_menu)):
+            main_canva.delete(rename_menu[i])
         menu_clicked.destroy_menu()
     cute_rectangle=main_canva.create_rectangle(200,200,800,800,outline="black",fill="white")
     textbox=Entry(root)
@@ -121,9 +127,10 @@ def rename(name):
     cute_labe=main_canva.create_window(500,400,window=label)
     cute_txtbox=main_canva.create_window(500,425,window=textbox)
     cute_button=main_canva.create_window(500,450,window=bouton)
+    global rename_menu
+    rename_menu=[cute_labe,cute_txtbox,cute_rectangle,cute_button]
 
 def icone():
-    print("hi")
     global object_list
     obj=object_list[selector.obj[0]][selector.obj[1]]
     global images
@@ -175,9 +182,25 @@ def menu(e):
 def destroy_menu():
     global menu_clicked 
     menu_clicked.destroy_menu()
-    selector.menu_enable=False 
+    selector.menu_enable=False
+
+def two_obj(numb_obj,e):
+    if len(numb_obj)<2:
+        global object_list
+        for i in range(len(object_list)):
+            for j in range(len(object_list[i])):
+                if e.x < object_list[i][j].rangeX[1] and e.x > object_list[i][j].rangeX[0]:
+                    if e.y<object_list[i][j].rangeY[1] and e.y > object_list[i][j].rangeY[0]:
+                        return object_list[i][j]                 
+    else:
+        return 0
+
+def create_link(obj_list):
+    main_canva.create_line(obj_list[1].posx,obj_list[1].posy,obj_list[0].posx,obj_list[0].posy,fill="black",width=3)
 ########################################VARIABLES####################################
 selector=pointeur()
+global link_list
+link_list=[]
 global object_list
 object_list=[[],[],[]]
 exit_button=Button(root,text="X",command=root.quit())
@@ -186,6 +209,9 @@ global images
 images=[ImageTk.PhotoImage(Image.open("routeur.png")),
         ImageTk.PhotoImage(Image.open("switch.png")),
         ImageTk.PhotoImage(Image.open("PC.png"))]
+global linked_obj
+linked_obj=[]
+ 
 
 #########################################CALLBACKS###############################
 def click(e):
@@ -199,6 +225,17 @@ def click(e):
     elif selector.menu_enable==True and selector.state=="None":
         global menu_clicked
         menu_clicked.is_clicked(e)
+    elif selector.state=="line":
+        global linked_obj
+        re=two_obj(linked_obj,e)
+        if re==0:
+            create_link(linked_obj)
+            linked_obj=[]
+        else:
+            linked_obj.append(re)
+        
+
+
     else:
         pass
         
@@ -213,6 +250,8 @@ def pressed(e):
         selector.state="Client"
     elif e.char=="e":
         selector.state="None"
+    elif e.char=="l":
+        selector.state="line"
     else:
         pass
 
@@ -230,9 +269,20 @@ def rmb(e):
                         return 0
     if selector.menu_enable is True:
          destroy_menu()    
-   
+
+def escape(e):
+    if selector.menu_enable==True:
+        global menu_clicked
+        menu_clicked.destroy_menu()
+        selector.menu_enable==False
+    if selector.rename==True:
+        global rename_menu
+        for i in range(len(rename_menu)):
+            main_canva.delete(rename_menu[i])
+    selector.state="None"
 root.bind("<KeyPress>",pressed)
 root.bind("<Button-1>",click)
 root.bind("<Button-2>",rmb)
 root.bind("<Button-3>",rmb)
+root.bind("<Escape>",escape)
 root.mainloop()
