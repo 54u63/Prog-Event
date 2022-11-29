@@ -19,6 +19,7 @@ class pointeur:
         self.icone=False
         self.obj=[0,0]
         self.rename=False
+        self.control=False
 ########################################CREATION DE L'OBJET ROUTEUR#########################
 class equipement():
     def __init__(self): 
@@ -220,10 +221,12 @@ def create_link(obj_list):
         return 1
 
 def draw(e):
+    line_drawed=None
     if main_canva.old_coords:
         p2_x,p2_y= main_canva.old_coords
-        main_canva.create_line(p2_x,p2_y,e.x,e.y,width=3,fill="black")
+        line_drawed=main_canva.create_line(p2_x,p2_y,e.x,e.y,width=3,fill="black")
     main_canva.old_coords=e.x,e.y
+    return line_drawed
     
 ########################################VARIABLES####################################
 selector=pointeur()
@@ -240,8 +243,10 @@ images=[ImageTk.PhotoImage(Image.open("routeur.png")),
         ImageTk.PhotoImage(Image.open("PC.png"))]
 global linked_obj
 linked_obj=[]
- 
-
+global draw_list
+draw_list=[]
+global drawing
+drawing=[]
 #########################################CALLBACKS###############################
 def click(e):
     global object_list
@@ -262,10 +267,9 @@ def click(e):
             linked_obj=[]
         else:
             linked_obj.append(re)
+        
     else:
         pass
-        
-
 
 def pressed(e):
     if e.char=="r":
@@ -276,13 +280,15 @@ def pressed(e):
         selector.state="Client"
     elif e.char=="e":
         selector.state="None"
+        main_canva.old_coords=None
     elif e.char=="l":
         selector.state="line"
     elif e.char=="d":
         selector.state="draw"
     else:
         pass
-
+    print(selector.state)
+    print(selector.control)
 def rmb(e):
     global object_list
     test=0
@@ -308,11 +314,26 @@ def escape(e):
         for i in range(len(rename_menu)):
             main_canva.delete(rename_menu[i])
     selector.state="None"
+    main_canva.old_coords=None
+    global drawing
+    global draw_list
+    draw_list.append(drawing)
+    print(draw_list)
+
 def motion(e):
     if selector.state=="draw":
-        draw(e)
+        global drawing
+        if selector.control==False:
+            drawing.append(draw(e))
 
+def control(e):
+    selector.control=True
 
+def release(e):
+    if selector.control==False:
+        pass
+    else:
+        selector.control=False
 
 root.bind("<KeyPress>",pressed)
 root.bind("<Button-1>",click)
@@ -320,4 +341,6 @@ root.bind("<Button-2>",rmb)
 root.bind("<Button-3>",rmb)
 root.bind("<Escape>",escape)
 root.bind("<B1-Motion>",motion)
+root.bind("<KeyRelease>",release)
+root.bind("<Control_L>",control)
 root.mainloop()
