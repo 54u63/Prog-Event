@@ -117,6 +117,7 @@ class link():
         self.obj=[start,end]
     def create_link(self):
         self.line=main_canva.create_line(self.start[0],self.start[1],self.end[0],self.end[1],fill="black",width=3)
+        print("woop link created")
         return self.line
 
 #########################################FONCTIONS####################################
@@ -227,7 +228,32 @@ def draw(e):
         line_drawed=main_canva.create_line(p2_x,p2_y,e.x,e.y,width=3,fill="black")
     main_canva.old_coords=e.x,e.y
     return line_drawed
-    
+
+def straight_lines(e):
+    global cc
+    if main_canva.old_coords:
+        if cc%2==1:
+            x,y=main_canva.old_coords
+            difx=((e.x-x)**2)**(1/2)
+            dify=((e.y-y)**2)**(1/2)
+            if difx>=dify:
+                line=main_canva.create_line(x,y,e.x,y,fill="black",width=3)
+            if difx<dify:
+                line=main_canva.create_line(x,y,x,e.y,fill="black",width=3)
+            main_canva.old_coords=e.x,e.y
+            cc+=1
+            return line
+
+        else:
+            main_canva.create_line(e.x,e.y,e.x+1,e.y+1,width=3,fill="black")
+            cc+=1
+            main_canva.old_coords=e.x,e.y
+    else:
+        main_canva.create_line(e.x,e.y,e.x+1,e.y+1,width=3,fill="black")
+        cc+=1
+        main_canva.old_coords=e.x,e.x
+
+
 ########################################VARIABLES####################################
 selector=pointeur()
 main_canva.old_coords=None
@@ -247,6 +273,8 @@ global draw_list
 draw_list=[]
 global drawing
 drawing=[]
+global cc
+cc=0
 #########################################CALLBACKS###############################
 def click(e):
     global object_list
@@ -267,7 +295,13 @@ def click(e):
             linked_obj=[]
         else:
             linked_obj.append(re)
-        
+    elif selector.state=="draw" and selector.control==True:
+        global draw_list
+        re=straight_lines(e)
+        if re!=None:
+            draw_list.append(re)
+        else:
+            pass
     else:
         pass
 
@@ -287,8 +321,6 @@ def pressed(e):
         selector.state="draw"
     else:
         pass
-    print(selector.state)
-    print(selector.control)
 def rmb(e):
     global object_list
     test=0
@@ -318,7 +350,6 @@ def escape(e):
     global drawing
     global draw_list
     draw_list.append(drawing)
-    print(draw_list)
 
 def motion(e):
     if selector.state=="draw":
