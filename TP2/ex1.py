@@ -49,7 +49,8 @@ class routeur(equipement):
         super().__init__()
         self.prefix="R"
         self.img=images[0]
-        self.port=1
+        self.port=2
+        self.port_aviable=2
     def initialize(self,e,identifier):
         super().initialize(e,identifier)
     def change_name(self,name):
@@ -61,6 +62,7 @@ class switch(equipement):
         self.prefix="S"
         self.img=images[1]
         self.port=2
+        self.port_aviable=2
     def initialize(self,e,identifier):
         super().initialize(e,identifier)
     def change_name(self,name):
@@ -72,6 +74,7 @@ class client(equipement):
         self.prefix="C"
         self.img=images[2]
         self.port=1
+        self.port_aviable=1
     def initialize(self,e,identifier):
         super().initialize(e,identifier)
     def change_name(self,name):
@@ -106,7 +109,14 @@ class menu_square:
                 icone()
                 return 0
 
-
+class link():
+    def __init__(self,start,end):
+        self.start=[start.posx,start.posy]
+        self.end=[end.posx,end.posy]
+        self.obj=[start,end]
+    def create_link(self):
+        self.line=main_canva.create_line(self.start[0],self.start[1],self.end[0],self.end[1],fill="black",width=3)
+        return self.line
 
 #########################################FONCTIONS####################################
 def rename(name):
@@ -196,9 +206,28 @@ def two_obj(numb_obj,e):
         return 0
 
 def create_link(obj_list):
-    main_canva.create_line(obj_list[1].posx,obj_list[1].posy,obj_list[0].posx,obj_list[0].posy,fill="black",width=3)
+    global link_list
+    if obj_list[0].port_aviable>0:
+        if obj_list[1].port_aviable>0:
+            current_link=link(obj_list[0],obj_list[1])
+            current_link.create_link()
+            link_list.append(current_link)
+            obj_list[0].port_aviable-=1
+            obj_list[1].port_aviable-=1
+            return 0
+    else:
+        print("pas assez de port sur la machine!")
+        return 1
+
+def draw(e):
+    if main_canva.old_coords:
+        p2_x,p2_y= main_canva.old_coords
+        main_canva.create_line(p2_x,p2_y,e.x,e.y,width=3,fill="black")
+    main_canva.old_coords=e.x,e.y
+    
 ########################################VARIABLES####################################
 selector=pointeur()
+main_canva.old_coords=None
 global link_list
 link_list=[]
 global object_list
@@ -233,9 +262,6 @@ def click(e):
             linked_obj=[]
         else:
             linked_obj.append(re)
-        
-
-
     else:
         pass
         
@@ -252,6 +278,8 @@ def pressed(e):
         selector.state="None"
     elif e.char=="l":
         selector.state="line"
+    elif e.char=="d":
+        selector.state="draw"
     else:
         pass
 
@@ -280,9 +308,16 @@ def escape(e):
         for i in range(len(rename_menu)):
             main_canva.delete(rename_menu[i])
     selector.state="None"
+def motion(e):
+    if selector.state=="draw":
+        draw(e)
+
+
+
 root.bind("<KeyPress>",pressed)
 root.bind("<Button-1>",click)
 root.bind("<Button-2>",rmb)
 root.bind("<Button-3>",rmb)
 root.bind("<Escape>",escape)
+root.bind("<B1-Motion>",motion)
 root.mainloop()
