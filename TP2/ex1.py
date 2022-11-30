@@ -20,6 +20,7 @@ class pointeur:
         self.obj=[0,0]
         self.rename=False
         self.control=False
+        self.delete=False
 ########################################CREATION DE L'OBJET ROUTEUR#########################
 class equipement():
     def __init__(self): 
@@ -44,7 +45,9 @@ class equipement():
     def change_name(self,name):
         self.name=name
         main_canva.itemconfigure(self.placeholder,text=self.name)
-
+    def destroy_itself(self):
+        main_canva.delete(self.object)
+        main_canva.delete(self.placeholder)
 class routeur(equipement):
     def __init__(self,images):
         super().__init__()
@@ -117,10 +120,22 @@ class link():
         self.obj=[start,end]
     def create_link(self):
         self.line=main_canva.create_line(self.start[0],self.start[1],self.end[0],self.end[1],fill="black",width=3)
+        self.obj[0].port_aviable-=1
+        self.obj[1].port_aviable-=1
         print("woop link created")
         return self.line
-
+    def destroy(self):
+        self.obj[1].port_aviable+=1
+        main_canva.delete(self.line)
 #########################################FONCTIONS####################################
+def is_obj_click(e):
+    global object_list
+    for i in range(len(object_list)):
+        for j in range(len(object_list[i])):
+            if e.x < object_list[i][j].rangeX[1] and e.x > object_list[i][j].rangeX[0]:
+                if e.y<object_list[i][j].rangeY[1] and e.y > object_list[i][j].rangeY[0]:
+                    return object_list[i][j] 
+
 def rename(name):
     global object_list
     selector.rename=True
@@ -198,12 +213,8 @@ def destroy_menu():
 
 def two_obj(numb_obj,e):
     if len(numb_obj)<2:
-        global object_list
-        for i in range(len(object_list)):
-            for j in range(len(object_list[i])):
-                if e.x < object_list[i][j].rangeX[1] and e.x > object_list[i][j].rangeX[0]:
-                    if e.y<object_list[i][j].rangeY[1] and e.y > object_list[i][j].rangeY[0]:
-                        return object_list[i][j]                 
+        obj=is_obj_click(e)
+        return obj
     else:
         return 0
 
@@ -214,8 +225,6 @@ def create_link(obj_list):
             current_link=link(obj_list[0],obj_list[1])
             current_link.create_link()
             link_list.append(current_link)
-            obj_list[0].port_aviable-=1
-            obj_list[1].port_aviable-=1
             return 0
     else:
         print("pas assez de port sur la machine!")
@@ -230,7 +239,7 @@ def draw(e):
     return line_drawed
 
 def straight_lines(e):
-    global cc
+    global cc 
     if main_canva.old_coords:
         if cc%2==1:
             x,y=main_canva.old_coords
@@ -252,6 +261,27 @@ def straight_lines(e):
         main_canva.create_line(e.x,e.y,e.x+1,e.y+1,width=3,fill="black")
         cc+=1
         main_canva.old_coords=e.x,e.x
+
+def get_link(obj):
+    global link_list
+    link=[]
+    for i in range(len(link_list)):
+        if obj in link_list[i].obj:
+           link.append(link_list[i])
+    return link
+
+def delete_obj(obj):
+    global link_list
+    obj.destroy_itself()
+    links=get_link(obj)
+    for i in range(len(links)):
+        links[i].destroy()
+        link_list.remove(links[i])
+    global object_list
+    for i in range(3):
+        if obj in object_list[i]:
+            object_list[i].remove(obj)
+
 
 
 ########################################VARIABLES####################################
@@ -302,6 +332,9 @@ def click(e):
             draw_list.append(re)
         else:
             pass
+    elif selector.state=="None" and selector.delete==True:
+        obj=is_obj_click(e)
+        delete_obj(obj)
     else:
         pass
 
@@ -350,6 +383,8 @@ def escape(e):
     global drawing
     global draw_list
     draw_list.append(drawing)
+    selector.delete=False
+    print(selector.delete)
 
 def motion(e):
     if selector.state=="draw":
@@ -366,6 +401,11 @@ def release(e):
     else:
         selector.control=False
 
+def delete(e):
+    selector.delete=True
+    print(selector.delete)
+
+
 root.bind("<KeyPress>",pressed)
 root.bind("<Button-1>",click)
 root.bind("<Button-2>",rmb)
@@ -374,4 +414,5 @@ root.bind("<Escape>",escape)
 root.bind("<B1-Motion>",motion)
 root.bind("<KeyRelease>",release)
 root.bind("<Control_L>",control)
+root.bind("<Delete>",delete)
 root.mainloop()
