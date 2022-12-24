@@ -48,15 +48,23 @@ class equipement():
     def destroy_itself(self):
         main_canva.delete(self.object)
         main_canva.delete(self.placeholder)
+    def move_itself(self,mv):
+        main_canva.move(self.object,mv[0],mv[1])
+        main_canva.move(self.placeholder,mv[0],mv[1])
+        self.rangeX=[self.rangeX[0]+mv[0],self.rangeX[1]+mv[0]]
+        self.rangeY=[self.rangeY[0]+mv[1],self.rangeY[1]+mv[1]]
+
 class routeur(equipement):
     def __init__(self,images):
         super().__init__()
+       
         self.prefix="R"
         self.img=images[0]
         self.port=2
         self.port_aviable=2
     def initialize(self,e,identifier):
         super().initialize(e,identifier)
+        print(self.posx)
     def change_name(self,name):
         super().change_name(name)
 ########################################CREATION DE LA CLASSE SWITCH###########################
@@ -271,6 +279,13 @@ def get_link(obj):
     return link
 
 def delete_obj(obj):
+    """
+    input : uun objet
+    supprime un objet (sa représentation ainsi que son nom sur le canva)
+    puis récupère la liste des lien auquel il est associé
+    afin ces liens sont détruits et retirés de la liste des liens.
+    l'objet est enfin retiré de la liste des objets
+    """
     global link_list
     obj.destroy_itself()
     links=get_link(obj)
@@ -282,6 +297,15 @@ def delete_obj(obj):
         if obj in object_list[i]:
             object_list[i].remove(obj)
 
+def move_obj(obj,mv):
+    """
+    input: un objet
+    modifie l'état des liens et de l'objet en fonction du déplacement de la souris
+    """
+    print(obj.name)
+    global link_list
+    obj.move_itself(mv)
+    print(mv)
 
 
 ########################################VARIABLES####################################
@@ -305,6 +329,8 @@ global drawing
 drawing=[]
 global cc
 cc=0
+global old_E_coord
+old_E_coord=[0,0]
 #########################################CALLBACKS###############################
 def click(e):
     global object_list
@@ -352,6 +378,8 @@ def pressed(e):
         selector.state="line"
     elif e.char=="d":
         selector.state="draw"
+    elif e.char=="m":
+        selector.state="move"
     else:
         pass
 def rmb(e):
@@ -391,6 +419,16 @@ def motion(e):
         global drawing
         if selector.control==False:
             drawing.append(draw(e))
+    elif selector.state=="move":
+        global old_E_coord
+        if old_E_coord==[0,0]:
+            mvmnt=[0,0]
+        else:
+            mvmnt=[e.x-old_E_coord[0],e.y-old_E_coord[1]]
+        old_E_coord=[e.x,e.y]
+        obj=is_obj_click(e)
+        move_obj(obj,mvmnt)
+
 
 def control(e):
     selector.control=True
@@ -403,8 +441,8 @@ def release(e):
 
 def delete(e):
     selector.delete=True
-    print(selector.delete)
-
+    obj=is_obj_click(e)
+    delete_obj(obj)
 
 root.bind("<KeyPress>",pressed)
 root.bind("<Button-1>",click)
