@@ -57,7 +57,6 @@ class equipement():
 class routeur(equipement):
     def __init__(self,images):
         super().__init__()
-       
         self.prefix="R"
         self.img=images[0]
         self.port=2
@@ -135,6 +134,19 @@ class link():
     def destroy(self):
         self.obj[1].port_aviable+=1
         main_canva.delete(self.line)
+    def move(self,obj,mv):
+        coords=main_canva.coords(self.line)
+        if obj==self.obj[0]:
+            new_coord=[self.start[0]+mv[0],self.start[1]+mv[1],self.end[0],self.end[1]]
+            main_canva.coords(self.line,new_coord[0],new_coord[1],new_coord[2],new_coord[3])
+            self.start[0]+=mv[0]
+            self.start[1]+=mv[1]
+            
+        else:
+            new_coord=[self.start[0],self.start[1],self.end[0]+mv[0],self.end[1]+mv[1]]
+            main_canva.coords(self.line,new_coord[0],new_coord[1],new_coord[2],new_coord[3])
+            self.end[0]+=mv[0]
+            self.end[1]+=mv[1]
 #########################################FONCTIONS####################################
 def is_obj_click(e):
     global object_list
@@ -295,17 +307,18 @@ def delete_obj(obj):
     global object_list
     for i in range(3):
         if obj in object_list[i]:
-            object_list[i].remove(obj)
+             object_list[i].remove(obj)
 
 def move_obj(obj,mv):
     """
     input: un objet
     modifie l'état des liens et de l'objet en fonction du déplacement de la souris
     """
-    print(obj.name)
     global link_list
     obj.move_itself(mv)
-    print(mv)
+    links=get_link(obj)
+    for link in links:
+        link.move(obj,mv)
 
 
 ########################################VARIABLES####################################
@@ -428,7 +441,6 @@ def motion(e):
         old_E_coord=[e.x,e.y]
         obj=is_obj_click(e)
         move_obj(obj,mvmnt)
-
 
 def control(e):
     selector.control=True
