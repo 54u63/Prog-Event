@@ -63,11 +63,6 @@ class routeur(equipement):
         self.img=images[0]
         self.port=2
         self.port_aviable=2
-    def initialize(self,e,identifier):
-        super().initialize(e,identifier)
-        print(self.posx)
-    def change_name(self,name):
-        super().change_name(name)
 ########################################CREATION DE LA CLASSE SWITCH###########################
 class switch(equipement):
     def __init__(self,images):
@@ -76,10 +71,6 @@ class switch(equipement):
         self.img=images[1]
         self.port=2
         self.port_aviable=2
-    def initialize(self,e,identifier):
-        super().initialize(e,identifier)
-    def change_name(self,name):
-        super().change_name(name)
 #########################################CREATION DE LA CLASSE CLIENT#########################
 class client(equipement):
     def __init__(self,images):
@@ -88,10 +79,6 @@ class client(equipement):
         self.img=images[2]
         self.port=1
         self.port_aviable=1
-    def initialize(self,e,identifier):
-        super().initialize(e,identifier)
-    def change_name(self,name):
-        super().change_name(name)
 
 class menu_square:
     def __init__(self): 
@@ -364,11 +351,13 @@ def click(e):
     elif selector.state=="line":
         global linked_obj
         re=two_obj(linked_obj,e)
-        if re==0:
+        if re==0 and re not in linked_obj:
             create_link(linked_obj)
             linked_obj=[]
-        else:
+        elif re not in linked_obj:
             linked_obj.append(re)
+        else:
+            print("no link created")
     elif selector.state=="draw" and selector.control==True:
         global draw_list
         re=straight_lines(e)
