@@ -147,6 +147,7 @@ class link():
             main_canva.coords(self.line,new_coord[0],new_coord[1],new_coord[2],new_coord[3])
             self.end[0]+=mv[0]
             self.end[1]+=mv[1]
+            #fix maybe
 #########################################FONCTIONS####################################
 def is_obj_click(e):
     global object_list
