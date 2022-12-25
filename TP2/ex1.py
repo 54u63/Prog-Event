@@ -53,6 +53,8 @@ class equipement():
         main_canva.move(self.placeholder,mv[0],mv[1])
         self.rangeX=[self.rangeX[0]+mv[0],self.rangeX[1]+mv[0]]
         self.rangeY=[self.rangeY[0]+mv[1],self.rangeY[1]+mv[1]]
+        self.posx+=mv[0]
+        self.posy+=mv[1]
 
 class routeur(equipement):
     def __init__(self,images):
@@ -345,6 +347,8 @@ global cc
 cc=0
 global old_E_coord
 old_E_coord=[0,0]
+global moved_obj
+moved_obj=pointeur
 #########################################CALLBACKS###############################
 def click(e):
     global object_list
@@ -434,14 +438,16 @@ def motion(e):
         if selector.control==False:
             drawing.append(draw(e))
     elif selector.state=="move":
+        global moved_obj
+        obj=is_obj_click(e)
         global old_E_coord
-        if old_E_coord==[0,0]:
+        if old_E_coord==[0,0]or moved_obj!=obj:
             mvmnt=[0,0]
         else:
             mvmnt=[e.x-old_E_coord[0],e.y-old_E_coord[1]]
         old_E_coord=[e.x,e.y]
-        obj=is_obj_click(e)
         move_obj(obj,mvmnt)
+        moved_obj=obj
 
 def control(e):
     selector.control=True
