@@ -160,7 +160,7 @@ class menu_square:
                 return 0
         if e.x<self.t2x+(self.size_x-18) and e.x>self.t2x-18:
             if e.y<self.t3y+7 and e.y>self.t3y-7:
-                print("port")#changement du nombre de port
+                port()
 ###################################################CLASSE LIEN#####################################################
 class link():
     """
@@ -217,6 +217,36 @@ def is_obj_click(e):
             if e.x < object_list[i][j].rangeX[1] and e.x > object_list[i][j].rangeX[0]:#pour rappel rangeX est la hitbox en x de l'équipement
                 if e.y<object_list[i][j].rangeY[1] and e.y > object_list[i][j].rangeY[0]:#et rangeY sa hitbox en Y
                     return object_list[i][j]  
+
+def port():
+    global object_list
+    obj=object_list[selector.obj[0]][selector.obj[1]]
+    def increment():
+        num=int(value.get())+1
+        value.set(str(num))
+    def decrement():
+        num=int(value.get())+1
+        value.set(str(num))
+    def validate():
+        new_val=int(value.get())
+        obj.port_aviable=new_val
+        for element in port_menu:
+            main_canva.delete(element)
+
+    label=Label(root,text="port de "+obj.name+" :")
+    value=StringVar()
+    value.set(obj.port_aviable)
+    num_holder=Label(root,textvariable=value)
+    btn_plus=Button(root,text="+",command=increment)
+    btn_moins=Button(root,text="-",command=decrement)
+    validate=Button(root,text="valider",command=validate)
+    cute_rectangle=main_canva.create_rectangle(200,200,800,800,outline="black",fill="white")
+    cute_name=main_canva.create_window(500,400,window=label)
+    cute_numholder=main_canva.create_window(500,425,window=num_holder)
+    cute_plus=main_canva.create_window(475,450,window=btn_plus)
+    cute_moins=main_canva.create_window(525,450,window=btn_moins)
+    cute_validate=main_canva.create_window(500,500,window=validate)
+    port_menu=[cute_name,cute_numholder,cute_plus,cute_moins,cute_validate,cute_rectangle]
 
 def rename():
     """
