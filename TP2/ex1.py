@@ -6,7 +6,7 @@ from tkinter import ttk
 
 
 
-root=Tk()
+root=Tk()#initialisation de la fenêtre
 main_canva=Canvas(root,bg="white",width=1000,height=1000)
 main_canva.pack()
 
@@ -25,14 +25,11 @@ class pointeur:
         self.rename:bool=False #si la fonction de renomage est disponible à l'écran
         self.control:bool=False#si la touche control est enfoncée
         self.delete:bool=False # si le mode suppression est actif
-########################################CREATION DE L'OBJET ROUTEUR#########################
+########################################CREATION DE L'OBJET EQUIPEMENT#########################
 class equipement():
     # la classe équipement est la classe maitresse. Elle regroupe les méthode de tous
     #les objets. Elle représente tous les équipements possibles
     def __init__(self): 
-        """
-        n'importe que la 
-        """
         self.size:int=35
     def initialize(self,e,identifier):
         """
@@ -75,6 +72,7 @@ class equipement():
         self.posx+=mv[0]
         self.posy+=mv[1]
 
+################################################ENFANTS DE EQUIPEMENTS#######################################"""
 class routeur(equipement):
     """
     classe représentant un routeur qui hérite de la classe des méthode de la super classe équipement
@@ -88,7 +86,7 @@ class routeur(equipement):
         self.img=images[0]#image de routeur
         self.port:int=2
         self.port_aviable:int=2
-########################################CREATION DE LA CLASSE SWITCH###########################
+
 class switch(equipement):
     """
     classe représentant un switch qui hérite de la classe des méthode de la super classe équipement
@@ -99,7 +97,7 @@ class switch(equipement):
         self.img=images[1]#image de switch
         self.port:int=2
         self.port_aviable:int=2
-#########################################CREATION DE LA CLASSE CLIENT#########################
+
 class client(equipement):
     """
     classe représentant un poste client qui hérite de la classe des méthode de la super classe équipement
@@ -111,6 +109,7 @@ class client(equipement):
         self.port:int=1
         self.port_aviable:int=1
 
+###################################################CLASSE MENU#####################################################
 class menu_square:
     """
     classe définisant le menu affiché lorsque l'utilisateur fait click droit sur l'écran
@@ -162,7 +161,7 @@ class menu_square:
         if e.x<self.t2x+(self.size_x-18) and e.x>self.t2x-18:
             if e.y<self.t3y+7 and e.y>self.t3y-7:
                 print("port")#changement du nombre de port
-
+###################################################CLASSE LIEN#####################################################
 class link():
     """
     classe définissant les liens entre les équipements
@@ -441,32 +440,36 @@ def move_obj(obj,mv):
 
 
 ########################################VARIABLES####################################
-selector=pointeur()
+selector=pointeur()#instantiation du sélecteur/pointeur/curseur
 main_canva.old_coords=None
-global link_list
+global link_list#liste des liens
 link_list=[]
-global object_list
+global object_list#liste des équipements dvisiée en 3 talbleau, un chacun des type
 object_list=[[],[],[]]
-exit_button=Button(root,text="X",command=root.quit())
-main_canva.create_window(925,10,window=exit_button)
-global images
+exit_button=Button(root,text="X",command=root.destroy)#destruction de la fenêtre
+main_canva.create_window(925,10,window=exit_button)#ajout du boutton dans le canva
+global images#liste des images des différents équipements
 images=[ImageTk.PhotoImage(Image.open("routeur.png")),
         ImageTk.PhotoImage(Image.open("switch.png")),
         ImageTk.PhotoImage(Image.open("PC.png"))]
-global linked_obj
+global linked_obj#tableau stockant les deux objets à lier lors de la création d'un lien
 linked_obj=[]
-global draw_list
+global draw_list#tableau de référencement des dessins
 draw_list=[]
 global drawing
-drawing=[]
-global cc
+drawing=[]#tableau stockant tout les points d'un dessin
+global cc#compteur de click pour le traits horizontaux et verticaux
 cc=0
-global old_E_coord
+global old_E_coord#anciennes coordonnées de e lors des déplacements
 old_E_coord=[0,0]
-global moved_obj
+global moved_obj#objet déplacés, initialisé a un objets différent pour éviter les erreurs lorsqu'il n'y a qu'un seul objet
 moved_obj=pointeur
 #########################################CALLBACKS###############################
 def click(e):
+    """
+    input: objet évent
+    syn: en fonction de la touche qui a été pressé et quand le b1 de la souris est pressé, appelle les différentes fonctions
+    """
     global object_list
     if selector.state=="Routeur":
         create_routeur(e,object_list,images)
@@ -478,6 +481,9 @@ def click(e):
         global menu_clicked
         menu_clicked.is_clicked(e)
     elif selector.state=="line":
+        """
+        appelle les fonction de création des liens et de vérification des clicks
+        """
         global linked_obj
         re=two_obj(linked_obj,e)
         if re==0 and re not in linked_obj:
@@ -488,6 +494,9 @@ def click(e):
         else:
             print("no link created")
     elif selector.state=="draw" and selector.control==True:
+        """
+        création des dessins
+        """
         global draw_list
         re=straight_lines(e)
         if re!=None:
@@ -495,12 +504,18 @@ def click(e):
         else:
             pass
     elif selector.state=="None" and selector.delete==True:
+        """
+        supression des objets
+        """
         obj=is_obj_click(e)
         delete_obj(obj)
     else:
         pass
 
 def pressed(e):
+    """
+    transforme l'état de la touche pressée en un état du sélecteur
+    """
     if e.char=="r":
         selector.state="Routeur"
     elif e.char=="s":
@@ -518,7 +533,13 @@ def pressed(e):
         selector.state="move"
     else:
         pass
+
 def rmb(e):
+    """
+    gestion du click droit
+    même fonction que "is_obj_clicked" mais adaptée au menu
+    implémentation à retravailler, fonctionnel mais terriblement laid
+    """
     global object_list
     test=0
     if selector.menu_enable is False:
@@ -531,9 +552,12 @@ def rmb(e):
                         selector.obj=[i,j]
                         return 0
     if selector.menu_enable is True:
-         destroy_menu()    
+         destroy_menu()#destruction du menu si deuxième clic droit et que menu activé
 
 def escape(e):
+    """
+    réinitialisation de tout les paramètres si appui sur la touche echap
+    """
     if selector.menu_enable==True:
         global menu_clicked
         menu_clicked.destroy_menu()
@@ -551,11 +575,20 @@ def escape(e):
     print(selector.delete)
 
 def motion(e):
+    """
+    gestion du click avec déplacement
+    """
     if selector.state=="draw":
+        """
+        simple dessin
+        """
         global drawing
         if selector.control==False:
             drawing.append(draw(e))
     elif selector.state=="move":
+        """
+        déplacement
+        """
         global moved_obj
         obj=is_obj_click(e)
         global old_E_coord
@@ -568,6 +601,9 @@ def motion(e):
         moved_obj=obj
 
 def control(e):
+    """
+    gestion de l'appuis de la touche ctrl
+    """
     selector.control=True
 
 def release(e):
@@ -577,10 +613,14 @@ def release(e):
         selector.control=False
 
 def delete(e):
+    """
+    supression d'un item si click sur delete
+    """
     selector.delete=True
     obj=is_obj_click(e)
     delete_obj(obj)
 
+#############################################BINDINGS######################################"
 root.bind("<KeyPress>",pressed)
 root.bind("<Button-1>",click)
 root.bind("<Button-2>",rmb)
