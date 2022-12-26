@@ -13,122 +13,190 @@ main_canva.pack()
 
 ########################################CREATION DE L'OBJET POINTEUR############################
 class pointeur:
+    """
+    classe qui symbolise le pointeur de la souris
+    ne sert qu'à stocker qu'un ensemble de données en lien avec celui-ci
+    """
     def __init__(self):
-        self.state="None"
-        self.menu_enable=False
-        self.icone=False
-        self.obj=[0,0]
-        self.rename=False
-        self.control=False
-        self.delete=False
+        self.state:str="None"#état clické par l'utilisateur
+        self.menu_enable:bool=False#si le menu est activé(menu click droit)
+        self.icone:bool=False#si la fonction de chamngement d'icone est acessible à l'écran
+        self.obj:list=[0,0]#l'objet cliqué
+        self.rename:bool=False #si la fonction de renomage est disponible à l'écran
+        self.control:bool=False#si la touche control est enfoncée
+        self.delete:bool=False # si le mode suppression est actif
 ########################################CREATION DE L'OBJET ROUTEUR#########################
 class equipement():
+    # la classe équipement est la classe maitresse. Elle regroupe les méthode de tous
+    #les objets. Elle représente tous les équipements possibles
     def __init__(self): 
         """
-        importe dans le constructeur l'image
-        et créé positions
+        n'importe que la 
         """
-        self.size=35
+        self.size:int=35
     def initialize(self,e,identifier):
         """
         initialise l'objet en l'important dans le canva
-        à l'endroit ou l'utilisateur à cliqué.
+        à l'endroit ou l'utilisateur à cliqué et en ajoutant
+        des extension à son constructeur
         """
-        self.posx=e.x
-        self.posy=e.y
-        self.id=identifier
-        self.name=self.prefix+str(self.id)
-        self.rangeX=[e.x-self.size,e.x+self.size]
-        self.rangeY=[e.y-self.size,e.y+self.size]
-        self.object=main_canva.create_image(self.posx,self.posy,image=self.img)
-        self.placeholder=main_canva.create_text(self.posx,self.posy+self.size,text=self.name)
+        self.posx:int=e.x#position en x
+        self.posy:int=e.y#et en y
+        self.id:int=identifier#combien de routeur créé (0 sera R0, si un routeur créé identifier = 1)
+        self.name:str=self.prefix+str(self.id)#nom
+        self.rangeX:list=[e.x-self.size,e.x+self.size]#taille de la hitbox en x
+        self.rangeY:list=[e.y-self.size,e.y+self.size]#taille de la hitbox en y
+        self.object=main_canva.create_image(self.posx,self.posy,image=self.img)#pose de l'image sur le canva
+        self.placeholder=main_canva.create_text(self.posx,self.posy+self.size,text=self.name)#pose du texte tenant le nom sur le canva
     def change_name(self,name):
-        self.name=name
+        """
+        input: constructeur,name
+        output: None
+        syn: Change le texte du placeholder avec le nom fournis en entrée
+        """
+        self.name:str=name
         main_canva.itemconfigure(self.placeholder,text=self.name)
     def destroy_itself(self):
+        """
+        destruction de l'objet en supprimant l'image et le nom
+        """
         main_canva.delete(self.object)
         main_canva.delete(self.placeholder)
-    def move_itself(self,mv):
+    def move_itself(self,mv:list):
+        """
+        input: constructeur,tableau de mouvement
+        syn: mv est un tableau qui décrit en x et en y les déplacements du cursuer([1,0],[0,-1],....)
+        déplacement des éléments en fonctions de ce tableau et mise à jour des valeurs.
+        """
         main_canva.move(self.object,mv[0],mv[1])
         main_canva.move(self.placeholder,mv[0],mv[1])
-        self.rangeX=[self.rangeX[0]+mv[0],self.rangeX[1]+mv[0]]
-        self.rangeY=[self.rangeY[0]+mv[1],self.rangeY[1]+mv[1]]
+        self.rangeX:list=[self.rangeX[0]+mv[0],self.rangeX[1]+mv[0]]
+        self.rangeY:list=[self.rangeY[0]+mv[1],self.rangeY[1]+mv[1]]
         self.posx+=mv[0]
         self.posy+=mv[1]
 
 class routeur(equipement):
+    """
+    classe représentant un routeur qui hérite de la classe des méthode de la super classe équipement
+    """
     def __init__(self,images):
+        """
+        input: image représentant le routeur
+        """
         super().__init__()
-        self.prefix="R"
-        self.img=images[0]
-        self.port=2
-        self.port_aviable=2
+        self.prefix:str="R"
+        self.img=images[0]#image de routeur
+        self.port:int=2
+        self.port_aviable:int=2
 ########################################CREATION DE LA CLASSE SWITCH###########################
 class switch(equipement):
+    """
+    classe représentant un switch qui hérite de la classe des méthode de la super classe équipement
+    """
     def __init__(self,images):
         super().__init__()
-        self.prefix="S"
-        self.img=images[1]
-        self.port=2
-        self.port_aviable=2
+        self.prefix:str="S"
+        self.img=images[1]#image de switch
+        self.port:int=2
+        self.port_aviable:int=2
 #########################################CREATION DE LA CLASSE CLIENT#########################
 class client(equipement):
+    """
+    classe représentant un poste client qui hérite de la classe des méthode de la super classe équipement
+    """
     def __init__(self,images):
         super().__init__()
-        self.prefix="C"
-        self.img=images[2]
-        self.port=1
-        self.port_aviable=1
+        self.prefix:str="C"
+        self.img=images[2]#image de PC
+        self.port:int=1
+        self.port_aviable:int=1
 
 class menu_square:
+    """
+    classe définisant le menu affiché lorsque l'utilisateur fait click droit sur l'écran
+    """
     def __init__(self): 
-        self.size_x=100
-        self.size_y=50
-        self.text_1="renomer"
-        self.text_2="icone"
+        self.size_x:int=100
+        self.size_y:int=50
+        self.text_1:str="renomer"
+        self.text_2:str="icone"
+        self.text_3:str="ports"
     def init_menu(self,e):
-        self.t1x=e.x+27
-        self.t2x=e.x+18
-        self.t1y=e.y+7
-        self.t2y=e.y+20 
-        self.rect=main_canva.create_rectangle(e.x,e.y,e.x+self.size_x,e.y+self.size_y,outline="black",fill="white")
-        self.t1=main_canva.create_text(self.t1x,self.t1y,text=self.text_1)
-        self.t2=main_canva.create_text(self.t2x,self.t2y,text=self.text_2)
+        """
+        input: constructeur, objet évent
+        output: None
+        syn: pose sur le canva les éléments permettant l'affichage du menu
+        """
+        self.t1x:int=e.x+27
+        self.t2x:int=e.x+18#les valeurs de x sont variable car le point de référence du texte est au centre et donc la taille de la hitbox 
+                           #du mot varie en -x et +x en fontion de sa longueur
+        self.t1y:int=e.y+7#police 7
+        self.t2y:int=e.y+20
+        self.t3y:int=e.y+33
+        self.rect=main_canva.create_rectangle(e.x,e.y,e.x+self.size_x,e.y+self.size_y,outline="black",fill="white")#créé un rectangle blanc sur lequel repose les éléments
+        self.t1=main_canva.create_text(self.t1x,self.t1y,text=self.text_1)#
+        self.t2=main_canva.create_text(self.t2x,self.t2y,text=self.text_2)#puis poses sur le rectangle les différents texte avec les espaces donné
+        self.t3=main_canva.create_text(self.t2x,self.t3y,text=self.text_3)#(réutilisation de t2x car t2 et t3 ont la même longueur de mots)
     def destroy_menu(self):
+        """
+        détruit le menu en supprimant les éléments du canva
+        """
         main_canva.delete(self.rect)
         main_canva.delete(self.t1)
         main_canva.delete(self.t2)
+        main_canva.delete(self.t3)
     def is_clicked(self,e):
+        """
+        input : l'élément e
+        syn: lancement des fonction du menu en fontion des hitbox des mots
+        """
         if e.x<self.t1x+(self.size_x-27) and e.x>self.t1x-27:
             if e.y<self.t1y+7 and e.y>self.t1y-7:
                 global object_list
-                rename(object_list[selector.obj[0]][selector.obj[1]].name)
+                rename()#lancement de la fonction de rename
                 return 0
         if e.x<self.t2x+(self.size_x-18) and e.x>self.t2x-18:
             if e.y<self.t2y+7 and e.y>self.t2y-7:
-                icone()
+                icone()#changment d'icone
                 return 0
+        if e.x<self.t2x+(self.size_x-18) and e.x>self.t2x-18:
+            if e.y<self.t3y+7 and e.y>self.t3y-7:
+                print("port")#changement du nombre de port
 
 class link():
+    """
+    classe définissant les liens entre les équipements
+    """
     def __init__(self,start,end):
-        self.start=[start.posx,start.posy]
-        self.end=[end.posx,end.posy]
-        self.obj=[start,end]
+        """
+        input, start un objet de la classe équipement, end un objet de la classe équipement
+        """
+        self.start:list=[start.posx,start.posy]#positionnement du lien sur la racine de l'équipement sur lequel l'utilisateur à clické en premier
+        self.end:list=[end.posx,end.posy]#positionnement du lien sur la racine de l'équipement sur lequel l'utilisateur à clické en dernier
+        self.obj:list=[start,end]#référencement des deux objets du lien 
     def create_link(self):
+        """
+        syn: dessin du lien du le canva et retranchement dans les ports disponibles des équipements concernés
+        """
         self.line=main_canva.create_line(self.start[0],self.start[1],self.end[0],self.end[1],fill="black",width=3)
         self.obj[0].port_aviable-=1
         self.obj[1].port_aviable-=1
-        print("woop link created")
         return self.line
     def destroy(self):
+        """
+        destruction de la ligne sur le canva, restitution des ports
+        """
         self.obj[1].port_aviable+=1
         main_canva.delete(self.line)
     def move(self,obj,mv):
-        coords=main_canva.coords(self.line)
+        """
+        input: l'objet déplacé, le tableau de déplacement
+        syn: déplace le lien en fontion de quel objet est déplacé
+        """
         if obj==self.obj[0]:
-            new_coord=[self.start[0]+mv[0],self.start[1]+mv[1],self.end[0],self.end[1]]
-            main_canva.coords(self.line,new_coord[0],new_coord[1],new_coord[2],new_coord[3])
-            self.start[0]+=mv[0]
+            new_coord=[self.start[0]+mv[0],self.start[1]+mv[1],self.end[0],self.end[1]]#création d'un nouveau tableau avec les nouvelles coordonnées 
+            main_canva.coords(self.line,new_coord[0],new_coord[1],new_coord[2],new_coord[3])#application de ces nouvelles coordonnées sur la ligne
+            self.start[0]+=mv[0]#changement du tableau de définition en x et en y de la ligne
             self.start[1]+=mv[1]
             
         else:
@@ -136,17 +204,29 @@ class link():
             main_canva.coords(self.line,new_coord[0],new_coord[1],new_coord[2],new_coord[3])
             self.end[0]+=mv[0]
             self.end[1]+=mv[1]
-            #fix maybe
 #########################################FONCTIONS####################################
 def is_obj_click(e):
+    """ 
+    input : e
+    output : l'objet cliqué par e
+    syn: import la liste d'objet et vérifie si e est dans les hitbox de chaque élément
+    sinon None est renvoyé
+    """
     global object_list
-    for i in range(len(object_list)):
+    for i in range(len(object_list)):#la liste est référencée plus loin
         for j in range(len(object_list[i])):
-            if e.x < object_list[i][j].rangeX[1] and e.x > object_list[i][j].rangeX[0]:
-                if e.y<object_list[i][j].rangeY[1] and e.y > object_list[i][j].rangeY[0]:
-                    return object_list[i][j] 
+            if e.x < object_list[i][j].rangeX[1] and e.x > object_list[i][j].rangeX[0]:#pour rappel rangeX est la hitbox en x de l'équipement
+                if e.y<object_list[i][j].rangeY[1] and e.y > object_list[i][j].rangeY[0]:#et rangeY sa hitbox en Y
+                    return object_list[i][j]  
 
-def rename(name):
+def rename():
+    """
+    syn: import la liste d'objet, active l'état du selecteur rename, récupère l'objet cliqué
+    puis créé un  recangle blanc sur lequel il dispose les éléments qu'il sotcke dans une tableau
+    enfin il stocke le nom dans un stringvar et appelle la fonction get_name quand le boutton est clické.
+    cette fonctionne appelle la méthode change_name de la classse équipement en lui passant en argument
+    le nouveau nom puis détruit tous les éléments disposés sur le menu.
+    """
     global object_list
     selector.rename=True
     obj=object_list[selector.obj[0]][selector.obj[1]]
@@ -168,12 +248,17 @@ def rename(name):
     rename_menu=[cute_labe,cute_txtbox,cute_rectangle,cute_button]
 
 def icone():
+    """
+    synopsis, importe l'objet clické ainsi que les images
+    puis change l'image en fontion du préfixe utilisé à chaque click (C'est le nom qui change lors du rename pas le préfix).
+    enfin il détruit le menu
+    """ 
     global object_list
     obj=object_list[selector.obj[0]][selector.obj[1]]
     global images
-    pref_list=["R","S","C"]
+    pref_list:list=["R","S","C"]
     index=pref_list.index(obj.prefix)
-    pref_used=""
+    pref_used:str=""
     if index==len(pref_list)-1:
         pref_used+=pref_list[0]
     else:
@@ -190,26 +275,40 @@ def icone():
     menu_clicked.destroy_menu()
     obj.prefix=pref_used
 
-
 def create_routeur(e,object_list,images):
-    selector.state="None" 
+    """
+    input: la liste d'objet, l'objet évent, la liste d'image
+    syn: créé un nouveau routeur et l'ajoute à la liste de référence des objets
+    """
+    selector.state="None" #réinitialisation de l'état du pointeur
     new_routeur=routeur(images)
     new_routeur.initialize(e,len(object_list[0]))
     object_list[0].append(new_routeur) 
     
 def create_switch(e,object_list,images):
+    """
+    syn: exactement la même chose que la fonction "create_routeur" mais avec les switchs
+    """
     selector.state="None" 
     new_switch=switch(images)
     new_switch.initialize(e,len(object_list[1]))
     object_list[1].append(new_switch)
 
 def create_client(e,object_list,images):
+    """
+    syn: exactement la même chose que la fonction "create_routeur" mais avec les PC
+    """
     selector.state="None" 
     new_client=client(images)
     new_client.initialize(e,len(object_list[2]))
     object_list[2].append(new_client)
 
 def menu(e):
+    """
+    input:l'objet évent
+    ouptut: les coordonnées du menu créé
+    syn: instancie un tableau et change l'état du pointeur
+    """
     global menu_clicked
     menu_clicked=menu_square()
     menu_clicked.init_menu(e)
@@ -217,18 +316,33 @@ def menu(e):
     return [e.x,e.y,e.x+ 100,e.y+50]
 
 def destroy_menu():
+    """
+    syn: détruit un menu, remet le pointeur sur son état initial
+    """
     global menu_clicked 
     menu_clicked.destroy_menu()
     selector.menu_enable=False
 
 def two_obj(numb_obj,e):
+    """
+    input: une liste d'objet,e
+    output: un objet de la classe équipement déjà posé sur le canva ou 0
+    syn renvoie l'objet clické par l'utilisateur, seulement si la liste contient moins de deux éléments
+    
+    """
     if len(numb_obj)<2:
         obj=is_obj_click(e)
         return obj
     else:
-        return 0
+         return 0
 
 def create_link(obj_list):
+    """
+    input: la liste des liens, la liste des objets entre lesquel les liens sont faits
+    output: 0/1
+    syn: vérifie le nombre de ports disponibles sur les deux machines et si c'est possible créé, instancie un lien entre les deux
+    et l'ajoute à la liste des liens
+    """
     global link_list
     if obj_list[0].port_aviable>0:
         if obj_list[1].port_aviable>0:
@@ -241,6 +355,11 @@ def create_link(obj_list):
         return 1
 
 def draw(e):
+    """
+    input : l'objet e
+    output : la ligne dessinée
+    syn: créé une ligne de 1px entre deux coordonées
+    """
     line_drawed=None
     if main_canva.old_coords:
         p2_x,p2_y= main_canva.old_coords
@@ -249,12 +368,17 @@ def draw(e):
     return line_drawed
 
 def straight_lines(e):
+    """
+    input: l'objet évent, un click counter
+    output: la liogne créée
+    syn: créé des lignes verticales ou horizontales entre deux points lorsque la touche control est enfoncée
+    """
     global cc 
     if main_canva.old_coords:
-        if cc%2==1:
+        if cc%2==1:#si il y a bien eut deux clicks
             x,y=main_canva.old_coords
-            difx=((e.x-x)**2)**(1/2)
-            dify=((e.y-y)**2)**(1/2)
+            difx:int=e.x-x#calcul de la différence en x
+            dify:int=e.y-y#et en y entre les deux points
             if difx>=dify:
                 line=main_canva.create_line(x,y,e.x,y,fill="black",width=3)
             if difx<dify:
@@ -267,12 +391,17 @@ def straight_lines(e):
             main_canva.create_line(e.x,e.y,e.x+1,e.y+1,width=3,fill="black")
             cc+=1
             main_canva.old_coords=e.x,e.y
-    else:
+    else:#sinon création d'un simple point
         main_canva.create_line(e.x,e.y,e.x+1,e.y+1,width=3,fill="black")
         cc+=1
         main_canva.old_coords=e.x,e.x
 
 def get_link(obj):
+    """
+    input: un objet de la classe équipement, la liste des liens
+    output: tous les liens de cet objet
+    syn: vérifie la présence d'un objet aux extrémitées d'un lien et l'ajoute à un liste retournée à la fin de la fonction
+    """
     global link_list
     link=[]
     for i in range(len(link_list)):
@@ -302,7 +431,7 @@ def delete_obj(obj):
 def move_obj(obj,mv):
     """
     input: un objet
-    modifie l'état des liens et de l'objet en fonction du déplacement de la souris
+    modifie l\'état des liens et de l\'objet en fonction du déplacement de la souris
     """
     global link_list
     obj.move_itself(mv)
