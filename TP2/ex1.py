@@ -84,18 +84,18 @@ class routeur(equipement):
         super().__init__()
         self.prefix:str="R"
         self.img=images[0]#image de routeur
-        self.port:int=2
+        self.port_max:int=4
         self.port_aviable:int=2
 
 class switch(equipement):
-    """
+    """ 
     classe représentant un switch qui hérite de la classe des méthode de la super classe équipement
     """
     def __init__(self,images):
         super().__init__()
         self.prefix:str="S"
         self.img=images[1]#image de switch
-        self.port:int=2
+        self.port_max:int=4
         self.port_aviable:int=2
 
 class client(equipement):
@@ -106,7 +106,7 @@ class client(equipement):
         super().__init__()
         self.prefix:str="C"
         self.img=images[2]#image de PC
-        self.port:int=1
+        self.port_max:int=2
         self.port_aviable:int=1
 
 ###################################################CLASSE MENU#####################################################
@@ -221,25 +221,30 @@ def is_obj_click(e):
 def port():
     global object_list
     obj=object_list[selector.obj[0]][selector.obj[1]]
+
     def increment():
         num=int(value.get())+1
         value.set(str(num))
     def decrement():
-        num=int(value.get())+1
+        num=int(value.get())-1
         value.set(str(num))
     def validate():
-        new_val=int(value.get())
-        obj.port_aviable=new_val
+        obj.port_aviable=int(value.get())
         for element in port_menu:
             main_canva.delete(element)
-
+    validate=Button(root,text="valider",command=validate)
+    def trace_value():
+        if int(value.get())>obj.port_max or int(value.get())<0:
+            validate["state"]="disabled"
+        else:
+            validate["state"]="normal"
     label=Label(root,text="port de "+obj.name+" :")
     value=StringVar()
+    value.trace("w", lambda name, index, mode, value=value: trace_value())
     value.set(obj.port_aviable)
     num_holder=Label(root,textvariable=value)
     btn_plus=Button(root,text="+",command=increment)
     btn_moins=Button(root,text="-",command=decrement)
-    validate=Button(root,text="valider",command=validate)
     cute_rectangle=main_canva.create_rectangle(200,200,800,800,outline="black",fill="white")
     cute_name=main_canva.create_window(500,400,window=label)
     cute_numholder=main_canva.create_window(500,425,window=num_holder)
