@@ -268,9 +268,12 @@ def rename():
         selector.rename=False
         global menu_clicked
         obj.change_name(textbox.get())
+        
         for i in range(len(rename_menu)):
             main_canva.delete(rename_menu[i])
+        
         menu_clicked.destroy_menu()
+        
     cute_rectangle=main_canva.create_rectangle(200,200,800,800,outline="black",fill="white")
     textbox=Entry(root)
     label=Label(root,text="nom?")
@@ -506,6 +509,8 @@ def click(e):
     syn: en fonction de la touche qui a été pressé et quand le b1 de la souris est pressé, appelle les différentes fonctions
     """
     global object_list
+    if selector.rename==True:
+        selector.state="None"
     if selector.state=="Routeur":
         create_routeur(e,object_list,images)
     elif selector.state=="Switch":
