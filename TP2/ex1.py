@@ -267,13 +267,10 @@ def rename():
     def get_name():
         selector.rename=False
         global menu_clicked
-        obj.change_name(textbox.get())
-        
+        obj.change_name(textbox.get())   
         for i in range(len(rename_menu)):
             main_canva.delete(rename_menu[i])
-        
         menu_clicked.destroy_menu()
-        
     cute_rectangle=main_canva.create_rectangle(200,200,800,800,outline="black",fill="white")
     textbox=Entry(root)
     label=Label(root,text="nom?")
